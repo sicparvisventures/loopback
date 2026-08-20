@@ -19,6 +19,10 @@ struct SettingsView: View {
     @AppStorage("whisperModel") private var whisperModel = "large-v3"
     @AppStorage("whisperPath") private var whisperPath = "/opt/homebrew/bin/whisper-cli"
     @AppStorage("modelPath") private var modelPath = "/opt/homebrew/share/whisper.cpp/models/ggml-large-v3.bin"
+
+    @State private var supabaseURL = SupabaseConfig.urlString ?? ""
+    @State private var supabaseAnonKey = SupabaseConfig.anonKey ?? ""
+    @State private var didSaveCredentials = false
     
     enum Theme: String, CaseIterable {
         case light = "Light"
@@ -28,10 +32,45 @@ struct SettingsView: View {
     
     var body: some View {
         Form {
+            Section("Supabase Connection") {
+                if !supabaseService.isConfigured {
+                    Label(
+                        "Not connected. Loopback works offline on this Mac; add your project URL and anon key to sync.",
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                }
+
+                TextField("Project URL", text: $supabaseURL, prompt: Text("https://your-project.supabase.co"))
+                    .textFieldStyle(.roundedBorder)
+
+                SecureField("Anon Key", text: $supabaseAnonKey, prompt: Text("eyJhbGci..."))
+                    .textFieldStyle(.roundedBorder)
+
+                HStack {
+                    Button("Save Connection") {
+                        SupabaseConfig.save(urlString: supabaseURL, anonKey: supabaseAnonKey)
+                        supabaseService.reloadConfiguration()
+                        didSaveCredentials = true
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    if didSaveCredentials {
+                        Label(
+                            supabaseService.isConfigured ? "Saved" : "URL or key looks invalid",
+                            systemImage: supabaseService.isConfigured ? "checkmark.circle.fill" : "xmark.circle.fill"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(supabaseService.isConfigured ? .green : .red)
+                    }
+                }
+            }
+
             Section("Account") {
                 if let user = supabaseService.currentUser {
                     HStack {
-                        AsyncImage(url: URL(string: user.userMetadata["avatar_url"] as? String ?? "")) { image in
+                        AsyncImage(url: URL(string: user.userMetadata["avatar_url"]?.stringValue ?? "")) { image in
                             image.resizable()
                         } placeholder: {
                             Circle().fill(Color.accentColor.opacity(0.2))
@@ -40,7 +79,7 @@ struct SettingsView: View {
                         .clipShape(Circle())
                         
                         VStack(alignment: .leading) {
-                            Text(user.userMetadata["full_name"] as? String ?? user.email ?? "User")
+                            Text(user.userMetadata["full_name"]?.stringValue ?? user.email ?? "User")
                                 .font(.headline)
                             Text(user.email ?? "")
                                 .font(.caption)

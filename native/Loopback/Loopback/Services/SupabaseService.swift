@@ -12,8 +12,25 @@ import SwiftData
 class SupabaseService: ObservableObject {
     static let shared = SupabaseService()
     
-    let client: SupabaseClient
+    /// Nil until Supabase credentials are supplied; see `SupabaseConfig`.
+    private var storedClient: SupabaseClient?
     private var modelContext: ModelContext?
+
+    /// Throws instead of trapping when the app is not connected to a project.
+    /// Every call site is already inside a `try`, so the guard costs nothing.
+    var client: SupabaseClient {
+        get throws {
+            if let storedClient { return storedClient }
+            guard let client = SupabaseConfig.makeClient() else {
+                throw SupabaseConfigError.notConfigured
+            }
+            storedClient = client
+            return client
+        }
+    }
+
+    /// Whether cloud sync is available at all. Drives the Settings banner.
+    var isConfigured: Bool { SupabaseConfig.isConfigured }
     
     @Published var currentUser: User?
     @Published var isAuthenticated = false
@@ -25,10 +42,12 @@ class SupabaseService: ObservableObject {
         case unauthenticated
     }
     
-    private init() {
-        let supabaseURL = URL(string: "YOUR_SUPABASE_URL")!
-        let supabaseKey = "YOUR_SUPABASE_ANON_KEY"
-        self.client = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
+    private init() {}
+
+    /// Re-reads credentials after the user edits them in Settings.
+    func reloadConfiguration() {
+        storedClient = nil
+        Task { await checkAuthState() }
     }
     
     func configure(with context: ModelContext) {
@@ -149,7 +168,7 @@ class SupabaseService: ObservableObject {
     func subscribeToMeetings(onChange: @escaping @Sendable ([Meeting]) -> Void) async throws -> RealtimeChannelV2 {
         guard let userId = currentUser?.id else { throw AuthError.notAuthenticated }
 
-        let channel = client.channel("meetings:\(userId.uuidString)")
+        let channel = try client.channel("meetings:\(userId.uuidString)")
         let changes = channel.postgresChange(
             AnyAction.self,
             schema: "public",

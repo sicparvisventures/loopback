@@ -11,7 +11,9 @@ import Supabase
 @main
 struct LoopbackApp: App {
     let container: ModelContainer
-    let supabaseClient: SupabaseClient
+    /// Nil when no Supabase project is configured; the app still runs on local
+    /// SwiftData and Settings prompts for credentials.
+    let supabaseClient: SupabaseClient?
 
     init() {
         // Configure SwiftData container
@@ -28,10 +30,9 @@ struct LoopbackApp: App {
             fatalError("Failed to create ModelContainer: \(error)")
         }
 
-        // Initialize Supabase client
-        let supabaseURL = URL(string: "YOUR_SUPABASE_URL")!
-        let supabaseKey = "YOUR_SUPABASE_ANON_KEY"
-        supabaseClient = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
+        // Initialize Supabase client. SupabaseClient.init traps on a malformed
+        // URL, so an unconfigured build must not construct one at all.
+        supabaseClient = SupabaseConfig.makeClient()
     }
 
     var body: some Scene {
