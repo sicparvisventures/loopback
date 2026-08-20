@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  web:
+    name: Web (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      # Supabase clients are constructed at build time; placeholders keep the
+      # build honest without exposing the real project.
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+
+  native:
+    name: Native (macOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: native/Loopback/.build
+          key: ${{ runner.os }}-spm-${{ hashFiles('native/Loopback/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-spm-
+      - name: Build Loopback.app
+        run: ./scripts/build-app.sh 0.0.0-ci
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Loopback-app-ci
+          path: dist/Loopback-0.0.0-ci-macos-universal.zip
+          retention-days: 7

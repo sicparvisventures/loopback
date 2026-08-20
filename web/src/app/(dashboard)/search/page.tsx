@@ -24,53 +24,63 @@ export default function SearchPage() {
   const [searchType, setSearchType] = useState<"fulltext" | "semantic">("fulltext");
 
   useEffect(() => {
-    if (query.trim()) {
-      performSearch(query);
-    } else {
-      setResults([]);
-    }
-  }, [query, searchType]);
+    const trimmed = query.trim();
+    // A stale in-flight request must not overwrite the results of a newer one.
+    let cancelled = false;
 
-  async function performSearch(q: string) {
-    setLoading(true);
-    try {
-      let data;
-      if (searchType === "semantic") {
-        // Semantic search via RPC (to be implemented)
-        const { data: semanticData } = await supabase.rpc("search_meetings_semantic", {
-          query_text: q,
-          match_count: 20,
-        });
-        data = semanticData;
-      } else {
-        // Full-text search
-        const { data: fulltextData } = await supabase
-          .from("meetings")
-          .select("*")
-          .textSearch("search_vector", q, { type: "websearch" })
-          .order("started_at", { ascending: false })
-          .limit(20);
-        data = fulltextData;
+    async function run() {
+      if (!trimmed) {
+        if (!cancelled) setResults([]);
+        return;
       }
-      setResults(data || []);
-    } catch (error) {
-      console.error("Search error:", error);
-      toast.error("Search failed");
-    } finally {
-      setLoading(false);
+
+      setLoading(true);
+      try {
+        let data;
+        if (searchType === "semantic") {
+          // Semantic search via RPC (to be implemented)
+          const { data: semanticData } = await supabase.rpc("search_meetings_semantic", {
+            query_text: trimmed,
+            match_count: 20,
+          });
+          data = semanticData;
+        } else {
+          // Full-text search
+          const { data: fulltextData } = await supabase
+            .from("meetings")
+            .select("*")
+            .textSearch("search_vector", trimmed, { type: "websearch" })
+            .order("started_at", { ascending: false })
+            .limit(20);
+          data = fulltextData;
+        }
+        if (!cancelled) setResults(data || []);
+      } catch (error) {
+        console.error("Search error:", error);
+        if (!cancelled) toast.error("Search failed");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-  }
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [query, searchType, supabase]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/dashboard/search?q=${encodeURIComponent(query)}`);
+      // The page lives at /search; the (dashboard) route group is not part of
+      // the URL, so /dashboard/search would 404.
+      router.push(`/search?q=${encodeURIComponent(query)}`);
     }
   }
 
   function clearSearch() {
     setQuery("");
-    router.push("/dashboard/search");
+    router.push("/search");
   }
 
   return (
