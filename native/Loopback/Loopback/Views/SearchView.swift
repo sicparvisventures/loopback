@@ -33,12 +33,12 @@ struct SearchView: View {
         let matchedText: String
         let matchType: MatchType
         
-        enum MatchType {
+        enum MatchType: String {
             case title
             case transcript
             case summary
             case notes
-            case actionItem
+            case actionItem = "action item"
         }
     }
     

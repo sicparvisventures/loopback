@@ -105,7 +105,7 @@ struct MeetingListView: View {
                 )
             } else {
                 List(filteredMeetings, selection: $selectedMeeting) { meeting in
-                    MeetingRowView(meeting: meeting)
+                    MeetingRowView(meeting: meeting, onOpen: { selectedMeeting = meeting })
                         .tag(meeting)
                 }
                 .listStyle(.sidebar)
@@ -116,6 +116,7 @@ struct MeetingListView: View {
 
 struct MeetingRowView: View {
     let meeting: Meeting
+    let onOpen: () -> Void
     
     var statusColor: Color {
         switch meeting.status {
@@ -187,7 +188,7 @@ struct MeetingRowView: View {
         }
         .padding(.vertical, 4)
         .contextMenu {
-            Button("Open", action: { selectedMeeting = meeting })
+            Button("Open", action: onOpen)
             Button("Copy Link") { }
             Divider()
             Button("Delete", role: .destructive) { }

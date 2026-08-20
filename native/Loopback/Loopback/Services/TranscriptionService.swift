@@ -15,11 +15,10 @@ class TranscriptionService: ObservableObject {
     private let whisperPath: String
     private let modelPath: String
     
-    override init() {
+    init() {
         // Default paths - user can configure
         self.whisperPath = "/opt/homebrew/bin/whisper-cli" // or wherever whisper.cpp is installed
         self.modelPath = "/opt/homebrew/share/whisper.cpp/models/ggml-large-v3.bin"
-        super.init()
     }
     
     func transcribe(audioURL: URL, language: String = "en") async throws -> TranscriptionResult {
@@ -57,13 +56,12 @@ class TranscriptionService: ObservableObject {
         errorPipe.fileHandleForReading.readabilityHandler = { [weak self] handle in
             let data = handle.availableData
             if let output = String(data: data, encoding: .utf8) {
-                self?.parseProgress(output)
+                Task { @MainActor [weak self] in self?.parseProgress(output) }
             }
         }
         
         do {
-            try process.run()
-            process.waitUntilExit()
+            try await Self.run(process)
             
             // Parse output
             let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
@@ -97,6 +95,17 @@ class TranscriptionService: ObservableObject {
         }
     }
     
+    /// Runs `process` to completion without blocking the main actor.
+    private static func run(_ process: Process) async throws {
+        try process.run()
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                process.waitUntilExit()
+                continuation.resume()
+            }
+        }
+    }
+
     private func parseProgress(_ output: String) {
         // Parse whisper.cpp progress output
         // Example: "[PROGRESS] 45.2%"

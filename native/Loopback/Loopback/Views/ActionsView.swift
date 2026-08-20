@@ -154,7 +154,7 @@ struct KanbanColumnView: View {
                 ForEach(actions) { action in
                     ActionCard(action: action)
                         .onDrag {
-                            action.id.uuidString
+                            NSItemProvider(object: action.id.uuidString as NSString)
                         }
                 }
                 

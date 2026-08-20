@@ -23,7 +23,7 @@ struct MenuBarView: View {
             HStack {
                 Image(systemName: "waveform.badge.mic")
                     .font(.title2)
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
                 Text("Loopback")
                     .font(.headline)
                 Spacer()

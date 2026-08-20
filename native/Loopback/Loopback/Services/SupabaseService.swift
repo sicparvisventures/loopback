@@ -109,7 +109,7 @@ class SupabaseService: ObservableObject {
         let remote = RemoteMeeting(from: meeting, userId: userId)
         let response: RemoteMeeting = try await client
             .from("meetings")
-            .insert(remote.toDictionary())
+            .insert(remote)
             .select()
             .single()
             .execute()
@@ -124,7 +124,7 @@ class SupabaseService: ObservableObject {
         let remote = RemoteMeeting(from: meeting, userId: userId)
         try await client
             .from("meetings")
-            .update(remote.toDictionary())
+            .update(remote)
             .eq("id", value: meeting.id.uuidString)
             .execute()
     }
@@ -142,26 +142,31 @@ class SupabaseService: ObservableObject {
     
     // MARK: - Real-time subscriptions
     
-    func subscribeToMeetings(onChange: @escaping ([Meeting]) -> Void) -> RealtimeChannel {
-        guard let userId = currentUser?.id else { fatalError("Not authenticated") }
-        
+    /// Streams every change to the caller's meetings.
+    ///
+    /// The returned channel must be kept alive by the caller and torn down with
+    /// `await channel.unsubscribe()`.
+    func subscribeToMeetings(onChange: @escaping @Sendable ([Meeting]) -> Void) async throws -> RealtimeChannelV2 {
+        guard let userId = currentUser?.id else { throw AuthError.notAuthenticated }
+
         let channel = client.channel("meetings:\(userId.uuidString)")
-        
-        let subscription = channel
-            .on(
-                event: .all,
-                schema: "public",
-                table: "meetings",
-                filter: "user_id=eq.\(userId.uuidString)"
-            ) { payload in
-                Task {
-                    if let meetings = try? await self.fetchMeetings() {
-                        await MainActor.run { onChange(meetings) }
-                    }
+        let changes = channel.postgresChange(
+            AnyAction.self,
+            schema: "public",
+            table: "meetings",
+            filter: "user_id=eq.\(userId.uuidString)"
+        )
+        await channel.subscribe()
+
+        Task { [weak self] in
+            for await _ in changes {
+                guard let self else { return }
+                if let meetings = try? await self.fetchMeetings() {
+                    onChange(meetings)
                 }
             }
-            .subscribe()
-        
+        }
+
         return channel
     }
     
@@ -257,27 +262,4 @@ struct RemoteMeeting: Codable {
         )
     }
     
-    func toDictionary() -> [String: Any] {
-        var dict: [String: Any] = [
-            "id": id,
-            "user_id": user_id,
-            "title": title,
-            "platform": platform,
-            "started_at": started_at,
-            "status": status,
-            "language": language,
-            "created_at": created_at,
-            "updated_at": updated_at
-        ]
-        
-        if let platform_meeting_id { dict["platform_meeting_id"] = platform_meeting_id }
-        if let ended_at { dict["ended_at"] = ended_at }
-        if let duration_seconds { dict["duration_seconds"] = duration_seconds }
-        if let audio_url { dict["audio_url"] = audio_url }
-        if let transcript_text { dict["transcript_text"] = transcript_text }
-        if let summary { dict["summary"] = summary }
-        if let notes_md { dict["notes_md"] = notes_md }
-        
-        return dict
-    }
 }

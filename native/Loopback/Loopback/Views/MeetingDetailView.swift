@@ -78,7 +78,7 @@ struct MeetingDetailHeader: View {
         HStack(spacing: 16) {
             Image(systemName: platformIcon)
                 .font(.title)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 44, height: 44)
                 .background(Color.accentColor.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
