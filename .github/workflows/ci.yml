@@ -31,9 +31,18 @@ jobs:
 
   native:
     name: Native (macOS)
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      - name: Select the newest Xcode
+        # supabase-swift needs swift-tools-version 6.1, and older toolchains
+        # silently drop its Realtime target during a universal build, which
+        # surfaces much later as "no such module 'Realtime'".
+        run: |
+          NEWEST=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Using $NEWEST"
+          sudo xcode-select -s "$NEWEST"
+          swift --version
       - uses: actions/cache@v4
         with:
           path: native/Loopback/.build
