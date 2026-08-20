@@ -1,7 +1,8 @@
 # Key Architectural Decisions
 
-**Date:** 2025-08-20
-**Author:** Dietmar (with opencode assistance)
+**Started:** 2025-08-20
+**Last updated:** 2026-08-21
+**Author:** Dietmar (with AI assistance)
 
 ## Decision Log
 
@@ -63,6 +64,57 @@
 - Built-in SEO optimization
 - Streaming and Suspense support
 
+### 8. Public Repository
+**Decision:** `sicparvisventures/loopback` is public
+**Date:** 2026-08-21
+**Rationale:**
+- Anonymous download was a hard requirement ("men moet gewoon een .app kunnen
+  downloaden of met curl")
+- GitHub Release assets and `raw.githubusercontent.com` both require a token
+  on a private repo, so `curl | bash` is impossible while private
+- History was audited for secrets before flipping; `.env.local` was never
+  tracked
+**Consequence:** never commit real credentials. `web/.env.local` stays local;
+production values live in Vercel env vars and repo secrets.
+
+### 9. Runtime Credential Resolution (Native)
+**Decision:** the macOS app resolves Supabase credentials at runtime, in order:
+UserDefaults (Settings UI) → Info.plist (injected by CI) → environment
+**Date:** 2026-08-21
+**Rationale:**
+- A downloadable binary cannot have a project URL and key baked into source
+- `SupabaseClient.init` **traps** on a malformed URL, so the placeholder
+  literals crashed the app at launch — an unconfigured build must not
+  construct a client at all
+- Unconfigured, Loopback still runs entirely on local SwiftData, which fits
+  the local-first stance in §2
+**See:** `native/Loopback/Loopback/Services/SupabaseConfig.swift`
+
+### 10. Ad-hoc Signing, Not Notarisation (for now)
+**Decision:** releases are ad-hoc signed (`codesign -s -`) and distributed
+outside the App Store
+**Date:** 2026-08-21
+**Rationale:**
+- Notarisation needs a paid Apple Developer ID; not worth it before the app
+  is real
+- Without *any* signature macOS refuses to launch arm64 binaries at all, so
+  ad-hoc is the floor, not a choice
+- `curl` does not set `com.apple.quarantine`, so the installer path has no
+  Gatekeeper prompt; only browser downloads need the right-click-Open dance
+**Trade-off:** ad-hoc signatures change every build, so macOS re-prompts for
+Screen Recording permission after each update. A real Developer ID fixes both
+this and the Gatekeeper prompt.
+
+### 11. macos-26 CI Runner
+**Decision:** native CI jobs run on `macos-26` and explicitly select the
+newest Xcode on the image
+**Date:** 2026-08-21
+**Rationale:** supabase-swift declares `swift-tools-version:6.1`. On
+`macos-15` the toolchain rejected its language-mode settings, silently
+dropped the `Realtime` target, and failed 40 seconds later with the
+misleading "no such module 'Realtime'". Pinning the newest Xcode makes the
+failure mode impossible rather than merely unlikely.
+
 ## Tech Stack Summary
 
 | Layer | Web | Native |
@@ -77,7 +129,7 @@
 | AI Summarization | Ollama (Edge Function) | Ollama (local) |
 | AI Embeddings | Ollama/nomic-embed-text | Ollama/nomic-embed-text |
 | Diarization | pyannote.audio (Edge) | pyannote.audio (Python bridge) |
-| Deployment | Vercel | Xcode Archive / TestFlight |
+| Deployment | Vercel (auto on push to `main`) | GitHub Release via `scripts/build-app.sh` |
 
 ## Rejected Alternatives
 

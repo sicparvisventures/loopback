@@ -3,7 +3,7 @@
   "project": "Loopback",
   "description": "Circleback.ai clone - AI-powered meeting notes for personal/team use",
   "created": "2025-08-20",
-  "lastUpdated": "2025-08-20",
+  "lastUpdated": "2026-08-21",
   "structure": {
     "bootstrap": "Project initialization & context loading",
     "heartbeat": "Session continuity & state tracking",
@@ -20,38 +20,182 @@
   },
   "index": {
     "bootstrap": [
-      {"file": "loopback-bootstrap.md", "title": "Loopback Bootstrap Context", "date": "2025-08-20", "tags": ["bootstrap", "context", "architecture"]}
+      {
+        "file": "loopback-bootstrap.md",
+        "title": "Loopback Bootstrap Context",
+        "date": "2025-08-20",
+        "tags": [
+          "bootstrap",
+          "context",
+          "architecture"
+        ]
+      }
     ],
     "heartbeat": [
-      {"file": "2025-08-20-session-1.md", "title": "Session 1 - Research & Scaffolding", "date": "2025-08-20", "tags": ["research", "scaffolding", "decisions"]},
-      {"file": "2025-08-20-session-2.md", "title": "Session 2 - Web & Native Scaffolding Complete", "date": "2025-08-20", "tags": ["web", "native", "scaffolding", "complete"]}
+      {
+        "file": "2025-08-20-session-1.md",
+        "title": "Session 1 - Research & Scaffolding",
+        "date": "2025-08-20",
+        "tags": [
+          "research",
+          "scaffolding",
+          "decisions"
+        ]
+      },
+      {
+        "file": "2025-08-20-session-2.md",
+        "title": "Session 2 - Web & Native Scaffolding Complete",
+        "date": "2025-08-20",
+        "tags": [
+          "web",
+          "native",
+          "scaffolding",
+          "complete"
+        ]
+      },
+      {
+        "file": "2026-08-21-session-3.md",
+        "title": "Session 3 - Repo, CI, Vercel Auto-Deploy & First macOS Release",
+        "date": "2026-08-21",
+        "tags": [
+          "git",
+          "ci",
+          "vercel",
+          "release",
+          "distribution",
+          "swift-fixes"
+        ]
+      }
     ],
     "agents": [],
     "memory": [
-      {"file": "key-decisions.md", "title": "Key Architectural Decisions", "date": "2025-08-20", "tags": ["decisions", "architecture", "tech-stack"]}
+      {
+        "file": "key-decisions.md",
+        "title": "Key Architectural Decisions",
+        "date": "2025-08-20",
+        "tags": [
+          "decisions",
+          "architecture",
+          "tech-stack"
+        ]
+      }
     ],
     "plans": [
-      {"file": "2025-08-20-loopback-design.md", "title": "Loopback Design Document", "date": "2025-08-20", "tags": ["design", "architecture", "mvp", "spec"]},
-      {"file": "2025-08-20-loopback-implementation.md", "title": "Loopback Implementation Plan", "date": "2025-08-20", "tags": ["implementation", "plan", "phases", "timeline"]}
+      {
+        "file": "2025-08-20-loopback-design.md",
+        "title": "Loopback Design Document",
+        "date": "2025-08-20",
+        "tags": [
+          "design",
+          "architecture",
+          "mvp",
+          "spec"
+        ]
+      },
+      {
+        "file": "2025-08-20-loopback-implementation.md",
+        "title": "Loopback Implementation Plan",
+        "date": "2025-08-20",
+        "tags": [
+          "implementation",
+          "plan",
+          "phases",
+          "timeline"
+        ]
+      }
     ],
     "architecture": [
-      {"file": "system-overview.md", "title": "System Architecture Overview", "date": "2025-08-20", "tags": ["architecture", "overview", "components"]}
+      {
+        "file": "system-overview.md",
+        "title": "System Architecture Overview",
+        "date": "2025-08-20",
+        "tags": [
+          "architecture",
+          "overview",
+          "components"
+        ]
+      },
+      {
+        "file": "release-pipeline.md",
+        "title": "Release & Deployment Pipeline",
+        "date": "2026-08-21",
+        "tags": [
+          "ci",
+          "vercel",
+          "github-actions",
+          "distribution",
+          "codesign"
+        ]
+      }
     ],
     "templates": [
-      {"file": "heartbeat.md", "title": "Heartbeat Template", "date": "2025-08-20"},
-      {"file": "analysis.md", "title": "Analysis Template", "date": "2025-08-20"},
-      {"file": "sparring.md", "title": "Sparring Template", "date": "2025-08-20"},
-      {"file": "implementation-plan.md", "title": "Implementation Plan Template", "date": "2025-08-20"},
-      {"file": "html-mockup.md", "title": "HTML Mockup Template", "date": "2025-08-20"},
-      {"file": "agent.md", "title": "Agent Template", "date": "2025-08-20"},
-      {"file": "memory-index.md", "title": "Memory Index Template", "date": "2025-08-20"},
-      {"file": "bootstrap.md", "title": "Bootstrap Template", "date": "2025-08-20"}
+      {
+        "file": "heartbeat.md",
+        "title": "Heartbeat Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "analysis.md",
+        "title": "Analysis Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "sparring.md",
+        "title": "Sparring Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "implementation-plan.md",
+        "title": "Implementation Plan Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "html-mockup.md",
+        "title": "HTML Mockup Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "agent.md",
+        "title": "Agent Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "memory-index.md",
+        "title": "Memory Index Template",
+        "date": "2025-08-20"
+      },
+      {
+        "file": "bootstrap.md",
+        "title": "Bootstrap Template",
+        "date": "2025-08-20"
+      }
     ],
     "analysis": [],
     "sparring": [],
     "implementation": [
-      {"file": "web-scaffolding-log.md", "title": "Web App Scaffolding Log", "date": "2025-08-20", "tags": ["web", "nextjs", "supabase", "scaffolding"]},
-      {"file": "native-scaffolding-log.md", "title": "Native App Scaffolding Log", "date": "2025-08-20", "tags": ["native", "swift", "swiftui", "swiftdata", "scaffolding"]}
+      {
+        "file": "web-scaffolding-log.md",
+        "title": "Web App Scaffolding Log",
+        "date": "2025-08-20",
+        "tags": [
+          "web",
+          "nextjs",
+          "supabase",
+          "scaffolding"
+        ]
+      },
+      {
+        "file": "native-scaffolding-log.md",
+        "title": "Native App Scaffolding Log",
+        "date": "2025-08-20",
+        "tags": [
+          "native",
+          "swift",
+          "swiftui",
+          "swiftdata",
+          "scaffolding"
+        ]
+      }
     ],
     "html-mockups": [],
     "meetings": []
@@ -66,6 +210,11 @@
     "supabase",
     "swift",
     "macos",
-    "meeting-bot"
+    "meeting-bot",
+    "ci-cd",
+    "vercel",
+    "github-releases",
+    "distribution",
+    "codesign"
   ]
 }
