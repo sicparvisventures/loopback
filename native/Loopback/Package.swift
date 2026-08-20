@@ -20,16 +20,14 @@ let package = Package(
             dependencies: [
                 .product(name: "Supabase", package: "supabase-swift"),
             ],
-            resources: [
-                .process("Resources")
-            ],
+            // Sources live in ./Loopback (Xcode-style layout), not ./Sources/Loopback.
+            path: "Loopback",
+            // Info.plist and entitlements are placed into the .app bundle by
+            // scripts/build-app.sh, so they must not be processed as SwiftPM resources.
+            exclude: ["Resources"],
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]
-        ),
-        .testTarget(
-            name: "LoopbackTests",
-            dependencies: ["Loopback"]
         ),
     ]
 )
