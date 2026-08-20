@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel
+
+# Swift / Xcode
+native/**/.build/
+native/**/.swiftpm/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+dist/
+*.zip
+*.dmg

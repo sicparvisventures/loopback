@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleDisplayName</key>
+    <string>Loopback</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.loopback.app</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Loopback</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2025 Loopback. All rights reserved.</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>Loopback needs screen recording permission to capture system audio for meeting recordings.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Loopback needs microphone access to record your voice during meetings.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Loopback may use camera for meeting bot video (optional).</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Loopback needs access to control other applications for calendar integration.</string>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Loopback saves meeting recordings to your Documents folder.</string>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>Loopback saves meeting recordings to your Documents folder.</string>
+    <key>NSRemindersUsageDescription</key>
+    <string>Loopback can create reminders for action items from meetings.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Loopback can access contacts to identify meeting participants.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Loopback reads your calendar to auto-join meetings and show schedule.</string>
+</dict>
+</plist>

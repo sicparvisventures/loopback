@@ -1,0 +1,16 @@
+// Project.pbxproj - This is a placeholder. The actual Xcode project should be created in Xcode.
+// See NATIVE_SETUP.md for instructions on creating the Xcode project.
+
+// To create the Xcode project:
+// 1. Open Xcode
+// 2. Create new project: macOS > App
+// 3. Name: Loopback
+// 4. Language: Swift
+// 5. Interface: SwiftUI
+// 6. Use Swift Data: Yes
+// 7. Save to: /Users/dietmar/loopback/native/Loopback/
+// 8. Add Package Dependency: https://github.com/supabase/supabase-swift
+// 9. Copy source files from Loopback/ folder
+// 10. Set Info.plist path
+// 11. Enable Sandbox: No (for screen recording)
+// 12. Add entitlements for: com.apple.security.device.audio-input, com.apple.security.device.microphone
