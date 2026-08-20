@@ -13,6 +13,43 @@ A Circleback.ai clone built with local-first AI, featuring a web app (Next.js + 
 - **Privacy-First** - Local AI processing, your data never leaves your infrastructure
 - **Dual Platform** - Web app + native macOS app with seamless sync
 
+## ⬇️ Installing the macOS app
+
+**One-liner** — recommended, and the only route with no Gatekeeper prompt
+(files fetched with `curl` are not quarantined):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sicparvisventures/loopback/main/scripts/install.sh | bash
+```
+
+This installs the latest release to `/Applications` (or `~/Applications` when
+`/Applications` is not writable — it never asks for `sudo`). Pin a version with
+`LOOPBACK_VERSION=v0.1.0`.
+
+**Manual download** — grab `Loopback-<version>-macos-universal.zip` from the
+[Releases page](https://github.com/sicparvisventures/loopback/releases/latest),
+unzip, and drag `Loopback.app` into Applications. Builds are ad-hoc signed but
+**not notarised**, so macOS blocks the first launch of a browser download.
+Either right-click the app and choose **Open**, or clear the quarantine flag:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Loopback.app
+```
+
+Requires **macOS 14 (Sonoma) or later**. Universal binary — one download for
+Apple Silicon and Intel. Verify against the release's `SHA256SUMS.txt`:
+
+```bash
+shasum -a 256 -c SHA256SUMS.txt
+```
+
+### First run
+
+1. Grant **Screen Recording** in System Settings → Privacy & Security, then
+   restart Loopback. Without it, system audio cannot be captured.
+2. Open **Settings → Supabase Connection** and enter your project URL and anon
+   key. Until then Loopback runs entirely locally on SwiftData; nothing syncs.
+
 ## 🏗 Architecture
 
 ```
@@ -61,6 +98,10 @@ loopback/
 │       ├── Views/
 │       ├── Services/
 │       └── Resources/
+├── scripts/                   # Release tooling
+│   ├── build-app.sh           # Assemble universal Loopback.app
+│   └── install.sh             # curl | bash installer
+├── .github/workflows/         # CI + macOS release automation
 └── setup-ai.sh               # AI pipeline installer
 ```
 
@@ -101,6 +142,12 @@ npm run dev
 2. Add Supabase Swift package dependency
 3. Configure entitlements for screen recording
 4. Build and run (⌘R)
+
+Or skip Xcode entirely:
+
+```bash
+./scripts/build-app.sh && open dist/Loopback.app
+```
 
 ## 🔧 Configuration
 
@@ -147,16 +194,22 @@ cd web
 npm run dev        # Development server
 npm run build      # Production build
 npm run lint       # ESLint
-npm run typecheck  # TypeScript check
 ```
+
+`next build` type-checks the whole app, so there is no separate typecheck
+script.
 
 ### Native App
 ```bash
 cd native/Loopback
-swift build        # Debug build
+swift build             # Debug build
 swift build -c release  # Release build
-swift test         # Run tests
 ```
+
+Sources live in `native/Loopback/Loopback/` (Xcode-style layout), which
+`Package.swift` points the target at explicitly. There is no test target yet.
+To produce a runnable app rather than a bare executable, use
+`./scripts/build-app.sh`.
 
 ### Database
 ```bash
@@ -175,14 +228,41 @@ npx supabase db reset            # Reset local DB
 ## 📦 Deployment
 
 ### Web (Vercel)
-1. Connect GitHub repo to Vercel
-2. Add environment variables
-3. Deploy
 
-### Native (Mac App Store / Direct)
-1. Archive in Xcode
-2. Notarize with Apple
-3. Distribute via TestFlight or direct download
+`main` deploys to production automatically. The Vercel project
+(`reserve4you/loopback`) is linked to this repository with **Root Directory
+`web`**, so every push to `main` builds and promotes; every pull request gets a
+preview URL.
+
+Set the runtime environment variables once, in Vercel → Settings → Environment
+Variables (the build succeeds without them, but Supabase calls will fail at
+runtime):
+
+| Variable | Scope |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Production, Preview, Development |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Production, Preview, Development |
+| `SUPABASE_SERVICE_ROLE_KEY` | Production only |
+| `NEXT_PUBLIC_APP_URL` | Production, Preview |
+
+### Native (macOS)
+
+Tag a version and CI builds and publishes the release:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+`.github/workflows/release-native.yml` builds a universal (Apple Silicon +
+Intel) `Loopback.app`, ad-hoc signs it, and attaches the zip plus a
+`SHA256SUMS.txt` to a GitHub Release. See [Installing](#-installing-the-macos-app).
+
+To cut a build locally instead:
+
+```bash
+./scripts/build-app.sh 0.1.0      # -> dist/Loopback.app + dist/Loopback-0.1.0-macos-universal.zip
+```
 
 ### Meeting Bots
 Deploy to Railway/Render/Fly.io for 24/7 availability
